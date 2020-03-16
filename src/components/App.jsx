@@ -14,34 +14,53 @@ class App extends React.Component {
 
     this.state = {
       movies: [],
-      moviesWillWatch: []
+      moviesWillWatch: [],
+      sort_by: 'popularity.desc',
     };
-    console.log("constructor");
+    // console.log("constructor");
   }
 
-  componentDidMount() {
-    console.log("didMount");
+  componentDidMount () {
+    console.log("App didMount");
     // fetch('https://api.themoviedb.org/3/discover/movie?api_key=3f4ca4f3a9750da53450646ced312397')
+    this.getMovies();
+    // console.log('after fetch');
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    console.log('App didUpdate');
+    // console.log('prev', prevProps, prevState);
+    // console.log('this', this.props, this.state);
+
+    if (prevState.sort_by !== this.state.sort_by) {
+      console.log('App call api');
+      this.getMovies();
+
+    }
+
+
+  }
+
+  getMovies = () => {
     fetch(
-      `${API_URL}/discover/movie?api_key=${API_KEY_3}&sort_by=popularity.desc`
+      `${API_URL}/discover/movie?api_key=${API_KEY_3}&sort_by=${this.state.sort_by}`
     )
       .then(response => {
-        console.log("then");
+        // console.log("then");
         return response.json();
       })
       .then(data => {
-        console.log("data", data);
+        // console.log("data", data);
         this.setState({
           movies: data.results
         });
       });
-    // console.log('after fetch');
-  }
+  };
 
   deleteMovie = movie => {
-    console.log(movie.id);
+    // console.log(movie.id);
     const updateMovies = this.state.movies.filter(item => item.id !== movie.id);
-    console.log(updateMovies);
+    // console.log(updateMovies);
 
     // this.state.movies = updateMovies;
     this.setState({
@@ -68,15 +87,25 @@ class App extends React.Component {
     });
   };
 
-  render() {
-    console.log("render", this);
+  updateSortBy = value => {
+    this.setState({
+      sort_by: value
+    });
+
+  };
+
+  render () {
+    console.log("render", this.state.sort_by);
     return (
       <div className="container">
         <div className="row mt-4">
           <div className="col-9">
             <div className="row mb-4">
               <div className="col-12">
-                <MovieTabs />
+                <MovieTabs
+                  sort_by={this.state.sort_by}
+                  updateSortBy={this.updateSortBy}
+                />
               </div>
             </div>
             <div className="row">
